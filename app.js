@@ -1,4 +1,5 @@
 //jshint esversion:6
+require('dotenv').config()                 //require it as early as possible in your app, no const required for this
 const express= require("express")
 const ejs = require("ejs")
 const bodyParser = require("body-parser")
@@ -8,6 +9,9 @@ const encrypt = require("mongoose-encryption")
 //mongoose encrypt will automatically encrypt encryptedField behind the scene, when .save() is called and it will automatically decrypt when .find() is called.
 
 const app = express()
+
+console.log(process.env.API_KEY)
+
 app.use(express.static("public"))
 app.set("view engine", "ejs" )
 app.use(bodyParser.urlencoded({extended:true}))
@@ -19,8 +23,7 @@ const userSchema= new mongoose.Schema({
   password: String
 })
 
-const secret= "Thisisourlittlesecret."                    //This is still vulnerable, and can be used to decrypt easily.
-userSchema.plugin(encrypt,{secret:secret, encryptedFields:["password"]})
+userSchema.plugin(encrypt,{secret:process.env.SECRET, encryptedFields:["password"]})
 
 const User= mongoose.model("User", userSchema)
 
